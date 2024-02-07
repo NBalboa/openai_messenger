@@ -7,28 +7,60 @@ const openai = new OpenAI({
 
 const chatCompletion = async (prompt) => {
     try {
+        let messages = [];
+        let content = prompt.trim();
+
+        // Check if prompt contains "/ai"
+        if (content.startsWith("/ai")) {
+            // Split the prompt by "/ai"
+            const parts = content.split("/ai").map((part) => part.trim());
+
+            // Check if there's a message after "/ai"
+            if (parts.length === 2 && parts[1] !== "") {
+                // Add the message to messages
+                messages.push({
+                    role: "user",
+                    content: parts[1],
+                });
+                content = parts[1];
+            } else {
+                // If no message after "/ai", ignore the prompt
+                return {
+                    status: 0,
+                    response: "No message provided after /ai.",
+                };
+            }
+        } else {
+            // If prompt doesn't contain "/ai", ignore it
+            return {
+                status: 0,
+                response: "Prompt does not contain /ai.",
+            };
+        }
+
+        // Add system message
+        messages.unshift({
+            role: "system",
+            content: "You are a helpful assistant.",
+        });
+
         const response = await openai.chat.completions.create({
-            messages: [
-                {
-                    role: "system",
-                    content: "You are a helpful assistant.",
-                },
-                { role: "user", content: prompt },
-            ],
-            model: "gpt-3.5-turbo",
+            messages,
+            model: "gpt-3.5-turbo-0125",
             temperature: 0.8,
         });
 
-        let content = response.choices[0].message.content;
-
+        content = response.choices[0].message.content;
+        console.log(content);
         return {
             status: 1,
             response: content,
         };
     } catch (error) {
+        console.log(error);
         return {
             status: 0,
-            response: "Please check openai API key.",
+            response: "Please check OpenAI API key.",
         };
     }
 };
