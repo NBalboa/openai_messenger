@@ -11,7 +11,7 @@ const chatCompletion = async (prompt) => {
         let content = prompt.trim();
 
         // Check if prompt contains "/ai"
-        if (content.startsWith("/ai")) {
+        if (content.startsWith("/ai") && content.length) {
             // Split the prompt by "/ai"
             const parts = content.split("/ai").map((part) => part.trim());
 
@@ -23,6 +23,25 @@ const chatCompletion = async (prompt) => {
                     content: parts[1],
                 });
                 content = parts[1];
+
+                // Add system message
+                messages.unshift({
+                    role: "system",
+                    content: "You are a helpful assistant.",
+                });
+
+                const response = await openai.chat.completions.create({
+                    messages,
+                    model: "gpt-3.5-turbo-0125",
+                    temperature: 0.8,
+                });
+
+                content = response.choices[0].message.content;
+                console.log(content);
+                return {
+                    status: 1,
+                    response: content,
+                };
             } else {
                 // If no message after "/ai", ignore the prompt
                 return {
@@ -37,25 +56,6 @@ const chatCompletion = async (prompt) => {
                 response: "Prompt does not contain /ai.",
             };
         }
-
-        // Add system message
-        messages.unshift({
-            role: "system",
-            content: "You are a helpful assistant.",
-        });
-
-        const response = await openai.chat.completions.create({
-            messages,
-            model: "gpt-3.5-turbo-0125",
-            temperature: 0.8,
-        });
-
-        content = response.choices[0].message.content;
-        console.log(content);
-        return {
-            status: 1,
-            response: content,
-        };
     } catch (error) {
         console.log(error);
         return {
