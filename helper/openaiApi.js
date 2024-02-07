@@ -57,10 +57,9 @@ const chatCompletion = async (prompt) => {
             };
         }
     } catch (error) {
-        console.log(error);
         return {
             status: 0,
-            response: "Please check OpenAI API key.",
+            response: error,
         };
     }
 };
