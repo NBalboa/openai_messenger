@@ -1,3 +1,4 @@
+const { response } = require("express");
 const { OpenAI } = require("openai");
 require("dotenv").config();
 
@@ -57,10 +58,17 @@ const chatCompletion = async (prompt) => {
             };
         }
     } catch (error) {
-        return {
-            status: 0,
-            response: error,
-        };
+        if (error?.status === 429) {
+            return {
+                status: 0,
+                response: "Please check OpenAI API key.",
+            };
+        } else {
+            return {
+                status: 0,
+                response: "Invalid Input. Input must be a text",
+            };
+        }
     }
 };
 
