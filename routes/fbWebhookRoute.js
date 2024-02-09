@@ -33,11 +33,9 @@ router.post("/", async (req, res) => {
         let result;
 
         const startGem = query.startsWith("/gem");
-
-        if (startGem) {
-            let prompt = query.slice(4);
-            console.log(prompt);
-            result = await chatGemini(prompt.trim());
+        let prompt = query.slice(4).trim();
+        if (startGem && prompt.length > 0) {
+            result = await chatGemini(prompt);
         } else {
             result = await chatCompletion(query);
         }
