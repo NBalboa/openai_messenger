@@ -25,10 +25,11 @@ router.get("/", (req, res) => {
 });
 
 router.post("/", async (req, res) => {
+    let body = req.body;
+    let senderId = body.entry[0].messaging[0].sender.id;
+    let query = body.entry[0].messaging[0].message.text;
+
     try {
-        let body = req.body;
-        let senderId = body.entry[0].messaging[0].sender.id;
-        let query = body.entry[0].messaging[0].message.text;
         await setTypingOn(senderId);
         let result;
 
