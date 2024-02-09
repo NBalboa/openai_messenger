@@ -32,10 +32,11 @@ router.post("/", async (req, res) => {
         await setTypingOn(senderId);
         let result;
 
-        const startGem = result.startsWith("/gem");
+        const startGem = query.startsWith("/gem");
 
         if (startGem) {
-            result = chatGemini(query.slice(4));
+            let prompt = query.slice(4);
+            result = chatGemini(prompt.trim());
         } else {
             result = await chatCompletion(query);
         }
