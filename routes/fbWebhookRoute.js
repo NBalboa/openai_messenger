@@ -43,7 +43,11 @@ router.post("/", async (req, res) => {
         await sendMessage(senderId, result.response);
         await setTypingOff(senderId);
     } catch (error) {
-        console.log(error);
+        await sendMessage(
+            senderId,
+            "Something went wrong please ask again. :)"
+        );
+        await setTypingOff(senderId);
     }
     res.status(200).send("OK");
 });
