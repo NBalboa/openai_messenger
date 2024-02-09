@@ -8,6 +8,7 @@ const {
     setTypingOff,
     setTypingOn,
 } = require("../helper/messengerApi");
+const { chatGemini } = require("../helper/geminiApi");
 
 router.get("/", (req, res) => {
     let mode = req.query["hub.mode"];
@@ -29,7 +30,16 @@ router.post("/", async (req, res) => {
         let senderId = body.entry[0].messaging[0].sender.id;
         let query = body.entry[0].messaging[0].message.text;
         await setTypingOn(senderId);
-        let result = await chatCompletion(query);
+        let result;
+
+        const startGem = result.startsWith("/gem");
+
+        if (startGem) {
+            result = chatGemini(query.slice(4));
+        } else {
+            result = await chatCompletion(query);
+        }
+
         await sendMessage(senderId, result.response);
         await setTypingOff(senderId);
     } catch (error) {
